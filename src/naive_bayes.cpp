@@ -95,15 +95,6 @@ std::size_t NaiveBayes::Learn(const std::vector<File> &files)
             loaded_file_number++;
     }
 
-    total_article_number_ += loaded_file_number;
-
-    // All the files read, calculate  possibilities.
-    for (auto &category : categories_)
-    {
-        category.second.CalculateLogProbability(total_article_number_,
-                                                dictionary_.size());
-    }
-
     return loaded_file_number;
 }
 
