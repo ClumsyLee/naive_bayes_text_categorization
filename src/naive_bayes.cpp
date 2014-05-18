@@ -1,7 +1,10 @@
-#include "naive_bayes.h"
 #include <cctype>
+#include <cmath>
 #include <fstream>
 #include <iostream>
+#include <limits>
+
+#include "naive_bayes.h"
 
 namespace homework {
 namespace experiment {
@@ -9,33 +12,34 @@ namespace experiment {
 Category::Category()
         : article_number_(0),
           word_number_(0),
-          basic_probability_(0.0),
+          basic_log_probability_(0.0),
           word_map_()
 {
 }
 
-void Category::CalculateProbability(std::size_t total_article_number,
-                                    std::size_t dictionary_size)
+void Category::CalculateLogProbability(std::size_t total_article_number,
+                                       std::size_t dictionary_size)
 {
     double category_probability = static_cast<double>(article_number_) /
                                   static_cast<double>(total_article_number);
-    basic_probability_ = 1.0 / (word_number_ + dictionary_size);
+    basic_log_probability_ = std::log(1.0 / (word_number_ + dictionary_size));
 
     for (auto &word : word_map_)
     {
-        word.second.probability = category_probability *
-                                  (word.second.count + 1) /
-                                  (word_number_ + dictionary_size);
+        word.second.log_probability =
+                std::log(category_probability *
+                         (word.second.count + 1) /
+                         (word_number_ + dictionary_size));
     }
 }
 
-double Category::Probability(const std::string &word) const
+double Category::LogProbability(const std::string &word) const
 {
     auto iter = word_map_.find(word);
     if (iter == word_map_.end())
-        return basic_probability_;
+        return basic_log_probability_;
     else
-        return iter->second.probability;
+        return iter->second.log_probability;
 }
 
 
@@ -68,8 +72,8 @@ std::size_t NaiveBayes::Learn(const std::vector<File> &files)
     // All the files read, calculate  possibilities.
     for (auto &category : categories_)
     {
-        category.second.CalculateProbability(total_article_number_,
-                                             dictionary_.size());
+        category.second.CalculateLogProbability(total_article_number_,
+                                                dictionary_.size());
     }
 
     return loaded_file_number;
@@ -84,20 +88,21 @@ const std::string * NaiveBayes::Classify(const std::string &filename,
         return nullptr;
 
     const std::string *best_category = nullptr;
-    double max_probability = 0.0;
+    double max_log_probability = std::numeric_limits<double>::lowest();
 
     for (const auto &category : categories_)
     {
-        double probability = Probability(category.second, words);
+        double log_probability = LogProbability(category.second, words);
 
         if (verbose)
         {
-            std::cout << category.first << ": " << probability << std::endl;
+            // show category name and probability
+            std::cout << category.first << ": " << log_probability << std::endl;
         }
 
-        if (probability > max_probability)
+        if (log_probability > max_log_probability)
         {
-            max_probability = probability;
+            max_log_probability = log_probability;
             best_category = &category.first;
         }
     }
@@ -170,17 +175,17 @@ bool NaiveBayes::ReadFile(const std::string &filename,
 
 
 
-double NaiveBayes::Probability(const Category &category,
-                               const std::vector<std::string> &words) const
+double NaiveBayes::LogProbability(const Category &category,
+                                  const std::vector<std::string> &words) const
 {
-    double probability = 1.0;
+    double log_probability = 0.0;
 
     for (const auto &word : words)
     {
-        probability *= category.Probability(word);
+        log_probability += category.LogProbability(word);
     }
 
-    return probability;
+    return log_probability;
 }
 
 

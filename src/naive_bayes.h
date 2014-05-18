@@ -24,21 +24,21 @@ class Category
         word_map_[word].count++;
         word_number_++;
     }
-    void CalculateProbability(std::size_t total_article_number,
-                              std::size_t dictionary_size);
-    double Probability(const std::string &word) const;
+    void CalculateLogProbability(std::size_t total_article_number,
+                                 std::size_t dictionary_size);
+    double LogProbability(const std::string &word) const;
 
  private:
     struct WordInfo
     {
         int count = 0;
-        double probability = 0.0;
+        double log_probability = 0.0;
     };
 
     std::size_t article_number_;
     std::size_t word_number_;
 
-    double basic_probability_;
+    double basic_log_probability_;
 
     std::unordered_map<std::string, WordInfo> word_map_;
 };
@@ -70,8 +70,8 @@ class NaiveBayes
                   bool only_read_known_words = false) const;
 
     // the words should only contains words that are in dictionary_
-    double Probability(const Category &category,
-                       const std::vector<std::string> &words) const;
+    double LogProbability(const Category &category,
+                          const std::vector<std::string> &words) const;
 
     std::map<std::string, Category> categories_;
 
