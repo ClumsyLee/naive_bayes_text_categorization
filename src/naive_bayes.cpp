@@ -168,6 +168,15 @@ bool NaiveBayes::ReadFile(const std::string &filename,
                 }
             }
         }
+
+        if (!fin)  // EOF reached
+        {
+            if (word.empty() ||
+                (only_read_known_words && dictionary_.count(word) == 0))
+            {}
+            else
+                words.push_back(word);
+        }
     }
 
     return true;
