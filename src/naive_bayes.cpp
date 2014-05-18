@@ -57,6 +57,33 @@ NaiveBayes::~NaiveBayes()
     delete filter_;
 }
 
+
+bool NaiveBayes::LearnFile(const File &file)
+{
+    std::vector<std::string> words;
+
+    if (!ReadFile(file.filename, words))
+        return false;
+
+    Category &this_category = categories_[file.category];
+    this_category.AddArticle();
+
+    for (const std::string &word : words)
+    {
+        if (filter_->IsValidWord(word))
+        {
+            dictionary_.insert(word);
+            this_category.AddWord(word);
+        }
+    }
+
+    // read success, become dirty
+    dirty_ = true;
+    total_article_number_++;
+
+    return true;
+}
+
 std::size_t NaiveBayes::Learn(const std::vector<File> &files)
 {
     std::size_t loaded_file_number = 0;
@@ -110,29 +137,6 @@ const std::string * NaiveBayes::Classify(const std::string &filename,
     return best_category;
 }
 
-
-
-bool NaiveBayes::LearnFile(const File &file)
-{
-    std::vector<std::string> words;
-
-    if (!ReadFile(file.filename, words))
-        return false;
-
-    Category &this_category = categories_[file.category];
-    this_category.AddArticle();
-
-    for (const std::string &word : words)
-    {
-        if (filter_->IsValidWord(word))
-        {
-            dictionary_.insert(word);
-            this_category.AddWord(word);
-        }
-    }
-
-    return true;
-}
 
 bool NaiveBayes::ReadFile(const std::string &filename,
                           std::vector<std::string> &words,
