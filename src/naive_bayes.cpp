@@ -48,7 +48,8 @@ NaiveBayes::NaiveBayes(Filter *filter)
         : categories_(),
           dictionary_(),
           total_article_number_(0),
-          filter_(filter)
+          filter_(filter),
+          dirty_(true)
 {
 }
 
@@ -110,6 +111,9 @@ std::size_t NaiveBayes::Learn(const std::vector<File> &files)
 const std::string * NaiveBayes::Classify(const std::string &filename,
                                          bool verbose) const
 {
+    if (dirty_)
+        Flush();
+
     std::vector<std::string> words;
     if (!ReadFile(filename, words, true))
         return nullptr;
@@ -186,6 +190,15 @@ bool NaiveBayes::ReadFile(const std::string &filename,
     return true;
 }
 
+void NaiveBayes::Flush()
+{
+    for (auto &category : categories_)
+    {
+        category.second.CalculateLogProbability(total_article_number_,
+                                                dictionary_.size());
+    }
+    dirty_ = false;
+}
 
 
 double NaiveBayes::LogProbability(const Category &category,

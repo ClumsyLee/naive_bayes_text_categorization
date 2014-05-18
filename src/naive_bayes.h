@@ -69,6 +69,9 @@ class NaiveBayes
                   std::vector<std::string> &words,
                   bool only_read_known_words = false) const;
 
+    // prepare to classify
+    void Flush();
+
     // the words should only contains words that are in dictionary_
     double LogProbability(const Category &category,
                           const std::vector<std::string> &words) const;
@@ -81,6 +84,8 @@ class NaiveBayes
     std::size_t total_article_number_;
 
     Filter *filter_;
+
+    bool dirty_;
 };
 
 }  // namespace experiment
