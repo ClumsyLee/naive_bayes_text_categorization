@@ -100,7 +100,7 @@ std::size_t NaiveBayes::Learn(const std::vector<File> &files)
 
 
 const std::string * NaiveBayes::Classify(const std::string &filename,
-                                         bool verbose) const
+                                         bool verbose)
 {
     if (dirty_)
         Flush();

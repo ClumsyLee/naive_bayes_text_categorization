@@ -59,7 +59,7 @@ class NaiveBayes
     bool LearnFile(const File &file);
     std::size_t Learn(const std::vector<File> &files);
     const std::string * Classify(const std::string &filename,
-                                 bool verbose = false) const;
+                                 bool verbose = false);
 
     NaiveBayes(const NaiveBayes &) = delete;
     NaiveBayes & operator=(const NaiveBayes &) = delete;
