@@ -21,7 +21,10 @@ class BasicFilter : public Filter
     BasicFilter() = default;
     virtual ~BasicFilter() = default;
 
-    virtual bool IsValidWord(const std::string &word) { return true; }
+    virtual bool IsValidWord(const std::string &word)
+    {
+        return word.size() >= 3;
+    }
 };
 
 }  // namespace experiment

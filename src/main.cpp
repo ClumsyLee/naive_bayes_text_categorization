@@ -1,6 +1,4 @@
 #include <iostream>
-#include "naive_bayes.h"
-#include "filter.h"
 #include "test_naive_bayes.h"
 
 using namespace homework::experiment;  // for convenience
